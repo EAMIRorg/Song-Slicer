@@ -1,7 +1,7 @@
 # Song Slicer
 
 ## Purpose
-This 1.0 app can be used by people with no programming experience to segment songs into its form sections. 
+Display the form of a piece of music by highlighting and labeling various regions. Assign colors and text to each region to show differences and similarities. 
 
 ## Dev setup
 ### Requirements
@@ -64,8 +64,8 @@ npm run make
 1) Store credentials in Keychain (one time):
 ```
 xcrun notarytool store-credentials "eamir-notary" \
-  --apple-id "vj@vjmanzo.com" \
-  --team-id "HSAYDGFEVC" \
+  --apple-id "YOUR_APPLE_ID_EMAIL" \
+  --team-id "YOUR_APPLE_TEAM_ID" \
   --password "YOUR_APP_SPECIFIC_PASSWORD"
 ```
 2) Create a `signing.env` file (see `signing.env.example`) if you want to override the profile name.
@@ -78,3 +78,11 @@ xcrun notarytool store-credentials "eamir-notary" \
 Using System.css project
 - should be all set to be used offline. If there's gaps in the ui use the internet version with the link.
 - Some icons used from https://iconoir.com/
+
+
+## Credits
+Original authors:
+- Vincent Boothroyd (@vboothroyd)
+- Seth Frank (@sethbfrank)
+- Gibson Phillips (@gibsonPhillips)
+This project is now adapted and part of EAMIR, co-authored by V.J. Manzo (@vjmanzo)
