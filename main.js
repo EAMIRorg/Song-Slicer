@@ -236,7 +236,7 @@ async function startPythonServer() {
     }
     const serverScript = path.join(__dirname, 'pythonServer.py');
 
-    pythonProcess = spawn(pythonExecutable, [serverScript], { shell: true, cwd: __dirname });
+    pythonProcess = spawn(pythonExecutable, [serverScript], { cwd: __dirname });
 
     pythonProcess.stdout.on('data', (data) => {
         console.log(`Python stdout: ${data}`);

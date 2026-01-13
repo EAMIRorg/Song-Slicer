@@ -6283,3 +6283,97 @@ Python stderr:     self.bind_server_socket()
            ^^^^^^^^^^^^^^^^^^^^^^
 OSError: [Errno 48] Address already in use
 
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: /bin/sh: /Volumes/Media/Git: No such file or directory
+
+Python stderr: ERROR:pythonServer:Exception on /call-python [POST]
+Traceback (most recent call last):
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/pythonServer.py", line 32, in call_python
+    result = runSegmentation(song_path, "STFT", "KMeans", clusters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/librosaMusicSeg.py", line 270, in runSegmentation
+    bound_frames = beats[bound_beats]
+                   ~~~~~^^^^^^^^^^^^^
+IndexError: index 104 is out of bounds for axis 0 with size 104
+
+Python stderr: ERROR:pythonServer:Exception on /call-python [POST]
+Traceback (most recent call last):
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/pythonServer.py", line 32, in call_python
+    result = runSegmentation(song_path, "STFT", "KMeans", clusters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/librosaMusicSeg.py", line 270, in runSegmentation
+    bound_frames = beats[bound_beats]
+                   ~~~~~^^^^^^^^^^^^^
+IndexError: index 104 is out of bounds for axis 0 with size 104
+
+Python stderr: ERROR:pythonServer:Exception on /call-python [POST]
+Traceback (most recent call last):
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/pythonServer.py", line 32, in call_python
+    result = runSegmentation(song_path, "STFT", "KMeans", clusters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Media/Git Repos/_GitHub/Song-Slicer/librosaMusicSeg.py", line 270, in runSegmentation
+    bound_frames = beats[bound_beats]
+                   ~~~~~^^^^^^^^^^^^^
+IndexError: index 104 is out of bounds for axis 0 with size 104
+
