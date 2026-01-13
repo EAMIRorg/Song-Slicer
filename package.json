@@ -24,8 +24,7 @@
           "app-update.yml"
         ],
         "ignore": [
-          "^/venv($|/)",
-          "^/node_modules($|/)"
+          "^/venv($|/)"
         ]
       },
       "makers": [
