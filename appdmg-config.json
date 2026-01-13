@@ -1,0 +1,27 @@
+{
+  "title": "Song-Slicer",
+  "icon": "./resources/icons/EAMIR.icns",
+  "background": "./resources/icons/dmg-background.png",
+  "window": {
+    "size": {
+      "width": 640,
+      "height": 400
+    }
+  },
+  "contents": [
+    {
+      "x": 180,
+      "y": 170,
+      "type": "file",
+      "path": "out/Song-Slicer-darwin-arm64/Song-Slicer.app",
+      "size": 128
+    },
+    {
+      "x": 480,
+      "y": 170,
+      "type": "link",
+      "path": "/Applications",
+      "size": 128
+    }
+  ]
+}

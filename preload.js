@@ -1,4 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
+const os = require('os');
+const path = require('path');
 
 window.addEventListener('DOMContentLoaded', () => {
     const replaceText = (selector, text) => {
@@ -24,7 +26,10 @@ contextBridge.exposeInMainWorld('api', {
   deleteDir: (dirPath) => ipcRenderer.invoke('delete-dir', dirPath),
   deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
   wipeDir: (dirPath) => ipcRenderer.invoke('wipe-dir', dirPath),
-  readFileAsArrayBuffer: (dirPath) => ipcRenderer.invoke('read-file', dirPath)
+  readFileAsArrayBuffer: (dirPath) => ipcRenderer.invoke('read-file', dirPath),
+  pathJoin: (...segments) => path.join(...segments),
+  pathBasename: (filePath) => path.basename(filePath || ''),
+  homeDir: () => os.homedir()
 });
 
 

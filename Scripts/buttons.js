@@ -256,6 +256,35 @@ htmlElements.globalTimelineButton.onclick = () => {
     }
 }
 
+htmlElements.zoomFullButton.onclick = () => {
+    const timeline = document.getElementById("waveforms");
+    const timelineWidth = timeline ? timeline.clientWidth : 0;
+    if (!timelineWidth) return;
+
+    let maxDuration = 0;
+    globalState.wavesurferWaveforms.forEach((waveform) => {
+        const duration = waveform.getDuration();
+        if (duration > maxDuration) {
+            maxDuration = duration;
+        }
+    });
+
+    if (maxDuration <= 0) return;
+
+    const targetPxPerSec = Math.max(1, Math.floor(timelineWidth / maxDuration));
+    globalState.currentZoom = targetPxPerSec;
+
+    globalState.wavesurferWaveforms.forEach((waveform, i) => {
+        if (waveform.getDuration() > 0) {
+            waveform.zoom(targetPxPerSec);
+            waveform.setScroll(0);
+            updateLabelPositions(i);
+            updateSegmentAnnotationPositions(i);
+            updateTimeline(i);
+        }
+    });
+}
+
 htmlElements.modifyBoundariesButton.onclick = () => {
     globalState.editBoundaryMode = !globalState.editBoundaryMode;
 

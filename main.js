@@ -1,17 +1,69 @@
 // const { app, BrowserWindow } = require('electron/main')
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const { spawn, exec } = require('child_process');
+const net = require('net');
 const fs = require('fs');
 const fspromises = require('fs/promises')
 
 let pythonProcess
+let mainWindow = null;
 let filePath = '';
+const PY_SERVER_PORT = parseInt(process.env.PY_SERVER_PORT || '5001', 10);
+const DEFAULT_WINDOW_STATE = { width: 800, height: 600 };
+let windowStateSaveTimeout = null;
+
+function getWindowStatePath() {
+    return path.join(app.getPath('userData'), 'window-state.json');
+}
+
+function loadWindowState() {
+    try {
+        const statePath = getWindowStatePath();
+        if (!fs.existsSync(statePath)) return { ...DEFAULT_WINDOW_STATE };
+        const data = JSON.parse(fs.readFileSync(statePath, 'utf-8'));
+        if (Number.isFinite(data.width) && Number.isFinite(data.height)) {
+            return { width: data.width, height: data.height };
+        }
+    } catch (error) {
+        console.warn('Unable to load window state:', error.message);
+    }
+    return { ...DEFAULT_WINDOW_STATE };
+}
+
+function queueWindowStateSave(win) {
+    if (!win || win.isDestroyed() || win.isMinimized()) return;
+    if (windowStateSaveTimeout) clearTimeout(windowStateSaveTimeout);
+    windowStateSaveTimeout = setTimeout(() => {
+        try {
+            const { width, height } = win.getBounds();
+            const statePath = getWindowStatePath();
+            fs.writeFileSync(statePath, JSON.stringify({ width, height }));
+        } catch (error) {
+            console.warn('Unable to save window state:', error.message);
+        }
+    }, 300);
+}
+
+function isPortInUse(port, host = '127.0.0.1') {
+    return new Promise((resolve) => {
+        const socket = new net.Socket();
+        const onError = () => resolve(false);
+        socket.setTimeout(500);
+        socket.once('error', onError);
+        socket.once('timeout', onError);
+        socket.connect(port, host, () => {
+            socket.end();
+            resolve(true);
+        });
+    });
+}
 
 // Gets appdata environment variable
 ipcMain.handle('get-appdata', () => {
-    // Access APPDATA environment variable
-    return process.env.APPDATA;
+    // Return a cross-platform user data directory
+    return app.getPath('userData');
 });
 
 // Gets the directory contents
@@ -157,7 +209,7 @@ ipcMain.handle('read-file', async (event, path) => {
 
 
 // Function to start the Python server
-function startPythonServer() {
+async function startPythonServer() {
     console.log("STARTING PYTHON SERVER");
 
     if (pythonProcess) {
@@ -165,15 +217,26 @@ function startPythonServer() {
         return;
     }
 
-    // // Path to the .exe (use path.join for compatibility)
-    // const pythonExecutable = path.join(__dirname, 'pythonServer.exe');
+    const portInUse = await isPortInUse(PY_SERVER_PORT);
+    if (portInUse) {
+        console.log(`Python server port ${PY_SERVER_PORT} already in use; skipping spawn.`);
+        return;
+    }
 
-    // pythonProcess = spawn(pythonExecutable, [], {
-    //     cwd: __dirname, // ensure working directory is correct
-    //     shell: false,   // no need for shell when calling .exe directly
-    // });
+    let pythonExecutable = process.env.PYTHON;
+    if (!pythonExecutable) {
+        const venvPath = process.platform === 'win32'
+            ? path.join(__dirname, 'venv', 'Scripts', 'python.exe')
+            : path.join(__dirname, 'venv', 'bin', 'python3');
+        if (fs.existsSync(venvPath)) {
+            pythonExecutable = venvPath;
+        } else {
+            pythonExecutable = process.platform === 'win32' ? 'python' : 'python3';
+        }
+    }
+    const serverScript = path.join(__dirname, 'pythonServer.py');
 
-    pythonProcess = spawn('python', ['pythonServer.py'], { shell: true });
+    pythonProcess = spawn(pythonExecutable, [serverScript], { shell: true, cwd: __dirname });
 
     pythonProcess.stdout.on('data', (data) => {
         console.log(`Python stdout: ${data}`);
@@ -210,7 +273,7 @@ async function stopPythonServer() {
             console.log("Shut down begin");
     
             // Send a POST request to the Python server to shutdown
-            const response = await fetch('http://127.0.0.1:5000/shutdown', {
+            const response = await fetch(`http://127.0.0.1:${PY_SERVER_PORT}/shutdown`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -235,9 +298,10 @@ function restartPythonServer() {
 }
 
 function createWindow() {
+    const windowState = loadWindowState();
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: windowState.width,
+        height: windowState.height,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
@@ -249,10 +313,66 @@ function createWindow() {
     startPythonServer()
 
     win.loadFile('page.html')
+    win.on('resize', () => queueWindowStateSave(win));
+    win.on('close', () => queueWindowStateSave(win));
+    mainWindow = win;
+}
+
+function initAutoUpdater() {
+    if (!app.isPackaged) return;
+
+    autoUpdater.autoDownload = false;
+
+    autoUpdater.on('error', (error) => {
+        console.error('Auto update error:', error);
+    });
+
+    autoUpdater.on('update-available', async (info) => {
+        const result = await dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            buttons: ['Download', 'Later'],
+            defaultId: 0,
+            cancelId: 1,
+            title: 'Update available',
+            message: `Version ${info.version} is available.`,
+            detail: 'Download and install the update now?',
+        });
+
+        if (result.response === 0) {
+            autoUpdater.downloadUpdate();
+        }
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        console.log('No updates available.');
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+        console.log(`Update download progress: ${Math.round(progress.percent)}%`);
+    });
+
+    autoUpdater.on('update-downloaded', async () => {
+        const result = await dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            buttons: ['Install and Relaunch', 'Later'],
+            defaultId: 0,
+            cancelId: 1,
+            title: 'Update ready',
+            message: 'Update downloaded.',
+            detail: 'Install and relaunch now?',
+        });
+
+        if (result.response === 0) {
+            autoUpdater.quitAndInstall();
+        }
+    });
+
+    autoUpdater.checkForUpdates();
 }
 
 app.whenReady().then(() => {
     createWindow()
+    initAutoUpdater();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {

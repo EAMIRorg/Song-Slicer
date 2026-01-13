@@ -4,3 +4,10 @@ py39env
 pythonServer.exe
 dist
 __pycache__
+venv/
+signing.env
+undefined\\Song Segmentation/
+/out
+.DS_Store
+undefined\Song Segmentation\colorPreferences.txt
+undefined\Song Segmentation\colorPreferences.txt

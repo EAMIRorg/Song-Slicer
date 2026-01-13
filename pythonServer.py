@@ -6,6 +6,7 @@ from waitress import serve
 from librosaMusicSeg import runSegmentation
 
 app = Flask(__name__)
+SERVER_PORT = int(os.environ.get("PY_SERVER_PORT", "5001"))
 
 # Create an endpoint
 @app.route('/call-python', methods=['POST'])
@@ -52,4 +53,4 @@ signal.signal(signal.SIGTERM, handle_exit_signal)
 
 if __name__ == '__main__':
     print("Starting Flask server with Waitress...")
-    serve(app, host='0.0.0.0', port=5000)
+    serve(app, host='0.0.0.0', port=SERVER_PORT)

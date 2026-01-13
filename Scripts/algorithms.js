@@ -1,12 +1,16 @@
 import { updateTrackName, globalState, updateSegmentElementsList, updateTimeline, loadSong, setExternalSegment, setExternalAutoSegment } from './globalData.js';
 import htmlElements from './globalData.js';
+const PY_SERVER_PORT = 5001;
+const PY_SERVER_BASE = `http://127.0.0.1:${PY_SERVER_PORT}`;
 
 // Import button
-htmlElements.importButton.addEventListener('click', async () => {
+htmlElements.importButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     const filePaths = await window.api.openFile();
     if (filePaths && filePaths.length > 0) {
         let waveformNum = await loadSong(filePaths[0]);
-        let filePathEnd = filePaths[0].split("\\").pop();
+        let filePathEnd = window.api.pathBasename(filePaths[0]);
         updateTrackName(filePathEnd, waveformNum);
     } else {
         console.log('No file selected');
@@ -22,7 +26,7 @@ async function segment(algorithm, waveformNum) {
         console.log("Segmenting begin");
 
         // Send a POST request to the Python server
-        const response = await fetch('http://127.0.0.1:5000/call-python', {
+        const response = await fetch(`${PY_SERVER_BASE}/call-python`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +83,7 @@ async function autoSegment(clusters, closestClusters, closestAverage, finalCall,
         console.log("Segmenting begin");
 
         // Send a POST request to the Python server
-        const response = await fetch('http://127.0.0.1:5000/call-python', {
+        const response = await fetch(`${PY_SERVER_BASE}/call-python`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

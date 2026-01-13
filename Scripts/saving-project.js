@@ -7,11 +7,14 @@ let workspace = ''
 let tracksWorkspace = ''
 let projectsWorkspace = ''
 let tempWorkspace = ''
+const joinPath = (...segments) => window.api.pathJoin(...segments);
+const getFileName = (filePath) => window.api.pathBasename(filePath);
 
 // gets the workspace
 let appdataPromise = window.api.getAppData().then((appdata) => {
     console.log(appdata);
-    workspace = appdata + '\\Song Segmentation'
+    const baseDir = appdata || joinPath(window.api.homeDir(), 'Song Slicer');
+    workspace = joinPath(baseDir, 'Song Segmentation')
     console.log(workspace)
 
     // Create a directory if it doesnt already exist
@@ -26,7 +29,7 @@ let appdataPromise = window.api.getAppData().then((appdata) => {
     });
 
     console.log(workspace);
-    tracksWorkspace = workspace + '\\tracks'
+    tracksWorkspace = joinPath(workspace, 'tracks')
     console.log(tracksWorkspace)
 
     // Create the tracks directory if it doesnt already exist
@@ -40,7 +43,7 @@ let appdataPromise = window.api.getAppData().then((appdata) => {
         presentErrorDialog("Issue creating the directory:\n" + error);
     });
 
-    projectsWorkspace = workspace + '\\projects'
+    projectsWorkspace = joinPath(workspace, 'projects')
     console.log(projectsWorkspace)
 
     // Create the projects directory if it doesnt already exist
@@ -54,7 +57,7 @@ let appdataPromise = window.api.getAppData().then((appdata) => {
         presentErrorDialog("Issue creating the directory:\n" + error);
     });
 
-    tempWorkspace = workspace + '\\temp'
+    tempWorkspace = joinPath(workspace, 'temp')
     console.log(tempWorkspace)
 
     // Create the projects directory if it doesnt already exist
@@ -105,7 +108,7 @@ htmlElements.loadTrackButton.addEventListener('click', async () => {
                     chosenTrack = file
                     console.log(chosenTrack);
                     htmlElements.loadTrackMenuDialog.close();
-                    let trackPath = tracksWorkspace + '\\' + chosenTrack;
+                    let trackPath = joinPath(tracksWorkspace, chosenTrack);
                     loadOneTrackData(trackPath, chosenTrack);
                 })
                 vbox.appendChild(newButton)
@@ -219,7 +222,7 @@ async function selectSaveTrack(waveformNum) {
                     chosenTrack = file
                     htmlElements.saveTrackMenuDialog.close();
                     await saveAudioToTemp(waveformNum);
-                    await deleteTheTrack(tracksWorkspace + '\\' + chosenTrack);
+                    await deleteTheTrack(joinPath(tracksWorkspace, chosenTrack));
                     
                     checkToSaveTrack(htmlElements.saveTrackInput.value, waveformNum, htmlElements.saveTrackAudioCheckbox.checked) // CHANGE WAVEFORM NUM
                 })
@@ -266,7 +269,7 @@ async function checkToSaveTrack(chosenTrack, waveformNum, saveTrackAudioFile) {
         }
     }
     try {
-        await window.api.createDirectory(tracksWorkspace + '\\' + currentTitle);
+        await window.api.createDirectory(joinPath(tracksWorkspace, currentTitle));
     } catch(error) {
         console.error('Issue creating files or directory:\n' + error);
     }
@@ -277,7 +280,7 @@ async function checkToSaveTrack(chosenTrack, waveformNum, saveTrackAudioFile) {
 async function saveTrackData(chosenTrack, waveformNum, saveTrackAudioFile) {
 
     if (chosenTrack != '') {
-        let saveTrackDirectoryPath = tracksWorkspace + "\\" + chosenTrack
+        let saveTrackDirectoryPath = joinPath(tracksWorkspace, chosenTrack)
         console.log('saveTrackDirectoryPath: ' + saveTrackDirectoryPath);
         
         await saveOneTrackData(saveTrackDirectoryPath, chosenTrack, waveformNum, saveTrackAudioFile);
@@ -348,7 +351,7 @@ async function openAreYouSureDialog(chosenTrack) {
     yesButton.textContent = 'yes'
     yesButton.addEventListener('click', async () => {
         htmlElements.areYouSureDialog.close();
-        let trackPath = tracksWorkspace + '\\' + chosenTrack;
+        let trackPath = joinPath(tracksWorkspace, chosenTrack);
         deleteTheTrack(trackPath)
     })
 
@@ -368,8 +371,8 @@ async function openAreYouSureDialog(chosenTrack) {
 
 async function saveAllAudioToTemp() {
     for (const songPath of window.songFilePaths) {
-        let filePathEnd = songPath.split("\\").pop();
-        await window.api.copySongFile(songPath, tempWorkspace + '\\' + filePathEnd);
+        let filePathEnd = getFileName(songPath);
+        await window.api.copySongFile(songPath, joinPath(tempWorkspace, filePathEnd));
     }
 
     console.log('all song files moved to temp')
@@ -377,9 +380,9 @@ async function saveAllAudioToTemp() {
 
 async function saveAudioToTemp(waveformNum) {
 
-    let filePathEnd = window.songFilePaths[waveformNum].split("\\").pop();
+    let filePathEnd = getFileName(window.songFilePaths[waveformNum]);
 
-    await window.api.copySongFile(window.songFilePaths[waveformNum], tempWorkspace + '\\' + filePathEnd);
+    await window.api.copySongFile(window.songFilePaths[waveformNum], joinPath(tempWorkspace, filePathEnd));
 }
 
 // deletes the track
@@ -388,7 +391,7 @@ async function deleteTheTrack(trackPath) {
         let files = await window.api.getDirectoryContents(trackPath);
 
         for (const file of files) {
-            await window.api.deleteFile(trackPath + '\\' + file);
+            await window.api.deleteFile(joinPath(trackPath, file));
             console.log("FILE WIPED");
         }
 
@@ -507,7 +510,7 @@ htmlElements.deleteProjectButton.addEventListener('click', async () => {
                     chosenProject = file
                     console.log(chosenProject);
                     htmlElements.deleteProjectMenuDialog.close();
-                    await deleteTheProjectData(projectsWorkspace + '\\' + chosenProject)
+                    await deleteTheProjectData(joinPath(projectsWorkspace, chosenProject))
                 })
                 vbox.appendChild(newButton)
             });
@@ -526,10 +529,10 @@ htmlElements.deleteProjectButton.addEventListener('click', async () => {
 async function loadTheProjectData(chosenProject) {
     window.currentProject = chosenProject;
     console.log('loading ' + chosenProject);
-    let projectPath = projectsWorkspace + '\\' + chosenProject;
+    let projectPath = joinPath(projectsWorkspace, chosenProject);
     await window.api.getDirectoryContents(projectPath).then((files) => {
         files.forEach(file => {
-            let trackPath = projectPath + '\\' + file;
+            let trackPath = joinPath(projectPath, file);
             loadOneTrackData(trackPath, file);
         });
     });
@@ -566,7 +569,7 @@ async function selectSaveProject() {
                     window.currentProject = htmlElements.saveProjectInput.value
                     htmlElements.saveProjectMenuDialog.close();
                     await saveAllAudioToTemp();
-                    await deleteTheProjectData(projectsWorkspace + '\\' + chosenProject);
+                    await deleteTheProjectData(joinPath(projectsWorkspace, chosenProject));
                     await checkToSaveProject(window.currentProject, htmlElements.saveProjectAudioCheckbox.checked)
                 })
                 vbox.appendChild(newButton)
@@ -613,7 +616,7 @@ async function checkToSaveProject(chosenProject, saveProjectAudioFile) {
         }
     }
     try {
-        await window.api.createDirectory(projectsWorkspace + '\\' + currentTitle);
+        await window.api.createDirectory(joinPath(projectsWorkspace, currentTitle));
     } catch(error) {
         console.error('Issue creating files or directory:\n' + error);
     }
@@ -622,12 +625,12 @@ async function checkToSaveProject(chosenProject, saveProjectAudioFile) {
 
 async function saveTheProjectData(chosenProject, saveProjectAudioFile) {
     console.log('Chosen Project ' + chosenProject + ' ' + saveProjectAudioFile)
-    let projectDirectory = projectsWorkspace + '\\' + chosenProject;
+    let projectDirectory = joinPath(projectsWorkspace, chosenProject);
     
     for (const waveformNum of globalState.waveformNums) {
         let trackName = window.trackNames[waveformNum];
         if (trackName != null) {
-            let projectTrackDirectory = projectDirectory + '\\' + trackName;
+            let projectTrackDirectory = joinPath(projectDirectory, trackName);
             try {
                 await window.api.createDirectory(projectTrackDirectory);
                 console.log('Directory creation handled successfully.');
@@ -652,7 +655,7 @@ async function cleanUpTemp() {
         let files = await window.api.getDirectoryContents(tempWorkspace);
 
         for (const file of files) {
-            await window.api.deleteFile(tempWorkspace + '\\' + file);
+            await window.api.deleteFile(joinPath(tempWorkspace, file));
             console.log("Deleted: " + file);
         }
     } catch (error) {
@@ -671,7 +674,7 @@ async function deleteTheProjectData(chosenProject) {
         let files = await window.api.getDirectoryContents(chosenProject);
 
         for (const file of files) {
-            await deleteTheTrack(chosenProject + '\\' + file);
+            await deleteTheTrack(joinPath(chosenProject, file));
             console.log("FILE WIPED");
         }
 
@@ -727,15 +730,15 @@ async function loadOneTrackData(trackDirectory, trackName) {
     await window.api.getDirectoryContents(trackDirectory).then((files) => {
         files.forEach(file => {
             if (file.substring(file.length-4,file.length) == '.wav' || file.substring(file.length-4,file.length) == '.mp3') {
-                loadTrackSongFilePath = trackDirectory + '\\' + file;
+                loadTrackSongFilePath = joinPath(trackDirectory, file);
             } else if (file.substring(file.length-13,file.length) == '-metadata.txt') {
-                loadTrackMetadataFilePath = trackDirectory + '\\' + file;
+                loadTrackMetadataFilePath = joinPath(trackDirectory, file);
             } else if (file.substring(file.length-16,file.length) == '-segmentdata.txt') {
-                loadTrackSegmentDataFilePath = trackDirectory + '\\' + file;
+                loadTrackSegmentDataFilePath = joinPath(trackDirectory, file);
             } else if (file.substring(file.length-15,file.length) == '-markerdata.txt') {
-                loadTrackMarkerNotesFilePath = trackDirectory + '\\' + file;
+                loadTrackMarkerNotesFilePath = joinPath(trackDirectory, file);
             } else if (file.substring(file.length-14,file.length) == '-colordata.txt') {
-                loadTrackColorDataFilePath = trackDirectory + '\\' + file;
+                loadTrackColorDataFilePath = joinPath(trackDirectory, file);
             }
         })
     })
@@ -780,30 +783,30 @@ async function saveOneTrackData(directory, trackName, waveformNum, saveTrackAudi
         try {
 
             // Writing the segment data to the file
-            let saveTrackSegmentDataFilePath = directory + '\\' + trackName + '-segmentdata.txt';
+            let saveTrackSegmentDataFilePath = joinPath(directory, trackName + '-segmentdata.txt');
             let segmentDataText = createSegmentDataFileText(waveformNum);
             window.api.writeToFile(saveTrackSegmentDataFilePath, segmentDataText);
 
             // Writing the metadata to the file
-            let saveTrackMetadataFilePath = directory + '\\' + trackName + '-metadata.txt';
+            let saveTrackMetadataFilePath = joinPath(directory, trackName + '-metadata.txt');
             let metadataText = createMetadataFileText(waveformNum);
             window.api.writeToFile(saveTrackMetadataFilePath, metadataText);
 
             // Writing the marker notes
-            let saveTrackMarkerNotesFilePath = directory + '\\' + trackName + '-markerdata.txt';
+            let saveTrackMarkerNotesFilePath = joinPath(directory, trackName + '-markerdata.txt');
             let markerNotesData = createMarkerNotesFileText(waveformNum);
             window.api.writeToFile(saveTrackMarkerNotesFilePath, markerNotesData);
 
             // Writing the color data
-            let saveTrackColorDataFilePath = directory + '\\' + trackName + '-colordata.txt';
+            let saveTrackColorDataFilePath = joinPath(directory, trackName + '-colordata.txt');
             let colorData = createColorDataFileText(waveformNum);
             window.api.writeToFile(saveTrackColorDataFilePath, colorData);
 
             // Copy song the song (if set to true)
             if (saveTrackAudioFile) {
-                let filePathEnd = window.songFilePaths[waveformNum].split("\\").pop();
-                let songFileFromTemp = tempWorkspace + '\\' + filePathEnd;
-                window.api.copySongFile(songFileFromTemp, directory + '\\' + filePathEnd);
+                let filePathEnd = getFileName(window.songFilePaths[waveformNum]);
+                let songFileFromTemp = joinPath(tempWorkspace, filePathEnd);
+                window.api.copySongFile(songFileFromTemp, joinPath(directory, filePathEnd));
             }
 
             updateTrackName(trackName, waveformNum);
@@ -819,25 +822,25 @@ async function saveOneTrackData(directory, trackName, waveformNum, saveTrackAudi
         try {
 
             // Writing the segment data to the file
-            let saveTrackSegmentDataFilePath = directory + '\\' + trackName + '-segmentdata.txt';
+            let saveTrackSegmentDataFilePath = joinPath(directory, trackName + '-segmentdata.txt');
             window.api.writeToFile(saveTrackSegmentDataFilePath, 'No data');
 
             // Writing the metadata to the file
-            let saveTrackMetadataFilePath = directory + '\\' + trackName + '-metadata.txt';
+            let saveTrackMetadataFilePath = joinPath(directory, trackName + '-metadata.txt');
             window.api.writeToFile(saveTrackMetadataFilePath, 'No data');
 
             // Writing the marker notes
-            let saveTrackMarkerNotesFilePath = directory + '\\' + trackName + '-markerdata.txt';
+            let saveTrackMarkerNotesFilePath = joinPath(directory, trackName + '-markerdata.txt');
             window.api.writeToFile(saveTrackMarkerNotesFilePath, 'No data');
 
             // Writing the color data
-            let saveTrackColorDataFilePath = directory + '\\' + trackName + '-colordata.txt';
+            let saveTrackColorDataFilePath = joinPath(directory, trackName + '-colordata.txt');
             window.api.writeToFile(saveTrackColorDataFilePath, 'No data');
 
             // Copy song the song (if set to true)
             if (saveTrackAudioFile) {
-                let filePathEnd = window.songFilePaths[waveformNum].split("\\").pop();
-                window.api.copySongFile(window.songFilePaths[waveformNum], directory + '\\' + filePathEnd);
+                let filePathEnd = getFileName(window.songFilePaths[waveformNum]);
+                window.api.copySongFile(window.songFilePaths[waveformNum], joinPath(directory, filePathEnd));
             }
 
         } catch (error) {
@@ -860,24 +863,24 @@ async function saveOneTrackData(directory, trackName, waveformNum, saveTrackAudi
         try {
 
             // Writing the segment data to the file
-            let saveTrackSegmentDataFilePath = directory + '\\' + trackName + '-segmentdata.txt';
+            let saveTrackSegmentDataFilePath = joinPath(directory, trackName + '-segmentdata.txt');
             let segmentDataText = createSegmentDataFileText(waveformNum);
             window.api.writeToFile(saveTrackSegmentDataFilePath, segmentDataText);
 
             // Writing the metadata to the file
-            let saveTrackMetadataFilePath = directory + '\\' + trackName + '-metadata.txt';
+            let saveTrackMetadataFilePath = joinPath(directory, trackName + '-metadata.txt');
             let metadataText = createMetadataFileText(waveformNum);
             window.api.writeToFile(saveTrackMetadataFilePath, metadataText);
 
             // Writing the marker notes
-            let saveTrackMarkerNotesFilePath = directory + '\\' + trackName + '-markerdata.txt';
+            let saveTrackMarkerNotesFilePath = joinPath(directory, trackName + '-markerdata.txt');
             let markerNotesData = createMarkerNotesFileText(waveformNum);
             window.api.writeToFile(saveTrackMarkerNotesFilePath, markerNotesData);
 
             // Copy song the song (if set to true)
             if (saveTrackAudioFile) {
-                let filePathEnd = window.songFilePaths[waveformNum].split("\\").pop();
-                window.api.copySongFile(window.songFilePaths[waveformNum], directory + '\\' + filePathEnd);
+                let filePathEnd = getFileName(window.songFilePaths[waveformNum]);
+                window.api.copySongFile(window.songFilePaths[waveformNum], joinPath(directory, filePathEnd));
             }
 
             updateTrackName(trackName, waveformNum);
@@ -893,21 +896,21 @@ async function saveOneTrackData(directory, trackName, waveformNum, saveTrackAudi
         try {
 
             // Writing the segment data to the file
-            let saveTrackSegmentDataFilePath = directory + '\\' + trackName + '-segmentdata.txt';
+            let saveTrackSegmentDataFilePath = joinPath(directory, trackName + '-segmentdata.txt');
             window.api.writeToFile(saveTrackSegmentDataFilePath, 'No data');
 
             // Writing the metadata to the file
-            let saveTrackMetadataFilePath = directory + '\\' + trackName + '-metadata.txt';
+            let saveTrackMetadataFilePath = joinPath(directory, trackName + '-metadata.txt');
             window.api.writeToFile(saveTrackMetadataFilePath, 'No data');
 
             // Writing the marker notes
-            let saveTrackMarkerNotesFilePath = directory + '\\' + trackName + '-markerdata.txt';
+            let saveTrackMarkerNotesFilePath = joinPath(directory, trackName + '-markerdata.txt');
             window.api.writeToFile(saveTrackMarkerNotesFilePath, 'No data');
 
             // Copy song the song (if set to true)
             if (saveTrackAudioFile) {
-                let filePathEnd = window.songFilePaths[waveformNum].split("\\").pop();
-                window.api.copySongFile(window.songFilePaths[waveformNum], directory + '\\' + filePathEnd);
+                let filePathEnd = getFileName(window.songFilePaths[waveformNum]);
+                window.api.copySongFile(window.songFilePaths[waveformNum], joinPath(directory, filePathEnd));
             }
 
             updateTrackName(trackName, waveformNum);
@@ -997,7 +1000,7 @@ function createColorDataFileText(waveformNum) {
 function calculateExportStats(waveformNum) {
 
     // Song Name
-    let songName = window.songFilePaths[waveformNum].split('\\').pop()
+    let songName = getFileName(window.songFilePaths[waveformNum]);
     songName = songName.substring(0, songName.length-4)
 
     // Song Length + start and end
@@ -1051,14 +1054,14 @@ async function loadColorPreferences() {
     await window.api.getDirectoryContents(workspace).then((files) => {
         files.forEach(file => {
             if (file.substring(file.length-20,file.length) == 'colorPreferences.txt') {
-                loadColorPreferencesFilePath = workspace + '\\' + file;
+                loadColorPreferencesFilePath = joinPath(workspace, file);
             }
         });
     });
 
     // If file doesn't already exist
     if(loadColorPreferencesFilePath === '') {
-        loadColorPreferencesFilePath = workspace + '\\' + 'colorPreferences.txt';
+        loadColorPreferencesFilePath = joinPath(workspace, 'colorPreferences.txt');
         let colorPreferencesText = '';
         await window.api.writeToFile(loadColorPreferencesFilePath, colorPreferencesText);
     }
@@ -1075,7 +1078,7 @@ async function saveColorPreferences() {
     console.log('saveDirectoryPath: ' + workspace);
 
     // Writing the segment data to the file
-    let colorPreferencesFilePath = workspace + '\\' + 'colorPreferences.txt';
+    let colorPreferencesFilePath = joinPath(workspace, 'colorPreferences.txt');
     let colorPreferencesText = createColorPreferencesFileText();
     window.api.writeToFile(colorPreferencesFilePath, colorPreferencesText);
 }

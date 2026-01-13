@@ -161,6 +161,7 @@ const htmlElements = {
     segmentAnnotationButton: document.getElementById("segment-annotations"),
     globalTimelineButton: document.getElementById("global-timeline"),
     modifyBoundariesButton: document.getElementById("modify-boundaries"),
+    zoomFullButton: document.getElementById("zoom-full"),
     trackExpandButton: document.getElementById("expand-button"),
     trackUnexpandButton: document.getElementById("unexpand-button"),
     trackTime: document.getElementById("track-time"),
@@ -1538,7 +1539,7 @@ function setupWaveformTrackVariables(waveformNum) {
         container: "#waveform" + String(waveformNum),
         waveColor: 'rgb(92, 92, 92)',
         progressColor: 'rgb(5, 5, 5)',
-        minPxPerSec: 100,
+        minPxPerSec: 1,
         plugins: [globalState.regions[waveformNum], ZoomPlugin.create({scale:0.1})],
         height: globalState.segmentAnnotationsPresent ? 113 : 163,
     }));

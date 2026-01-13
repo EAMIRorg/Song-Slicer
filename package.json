@@ -1,29 +1,93 @@
 {
-  "name": "my-electron-app",
+  "name": "song-slicer",
   "version": "0.1.0",
-  "description": "Song-Segmentation-Hello-World",
+  "description": "Display the form of a piece of music by highlighting and labeling various regions.",
+  "productName": "Song-Slicer",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "first-run": "bash scripts/first-run.sh",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "python3 -m pip install --upgrade pip && python3 -m pip install -r requirements.txt"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "resources/icons/EAMIR",
+        "appId": "org.eamir.song-slicer",
+        "appBundleId": "org.eamir.song-slicer",
+        "appCategoryType": "public.app-category.music",
+        "extraResource": [
+          "app-update.yml"
+        ],
+        "ignore": [
+          "^/venv($|/)",
+          "^/node_modules($|/)"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "icon": "resources/icons/EAMIR.icns"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "platforms": [
+            "win32"
+          ],
+          "config": {
+            "setupIcon": "resources/icons/EAMIR.ico"
+          }
+        }
+      ],
+      "publishers": [
+        {
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": {
+              "owner": "EAMIRorg",
+              "name": "Song-Slicer"
+            }
+          }
+        }
+      ]
+    }
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gibsonPhillips/Horisontol-Song-Segmentation-App-Final.git"
   },
-  "author": "WPI-MQP-TeamName",
+  "author": "EAMIR",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/gibsonPhillips/Horisontol-Song-Segmentation-App-Final/issues"
   },
-  "homepage": "https://github.com/gibsonPhillips/Horisontol-Song-Segmentation-App-Final#readme",
+  "homepage": "http://eamir.org",
   "devDependencies": {
-    "electron": "^33.2.1"
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-dmg": "^7.8.3",
+    "@electron-forge/maker-squirrel": "^7.8.3",
+    "@electron-forge/maker-zip": "^7.8.3",
+    "@electron-forge/publisher-github": "^7.8.3",
+    "electron": "^33.2.1",
+    "png-to-ico": "^3.0.1"
   },
   "dependencies": {
     "appdata-path": "^1.0.0",
+    "electron-updater": "^6.6.2",
     "file-saver": "^2.0.5",
-    "node": "^23.6.0",
+    "node": "^23.11.1",
     "wavesurfer.js": "^7.8.16"
   }
 }
