@@ -4,14 +4,43 @@ const PY_SERVER_PORT = 5001;
 const PY_SERVER_BASE = `http://127.0.0.1:${PY_SERVER_PORT}`;
 
 // Import button
+let warnedNonWav = false;
+let softNoticeTimeout = null;
+
+function showSoftNotice(message) {
+    let notice = document.getElementById('soft-notice');
+    if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'soft-notice';
+        notice.className = 'soft-notice';
+        document.body.appendChild(notice);
+    }
+
+    notice.textContent = message;
+    notice.classList.add('soft-notice-show');
+
+    if (softNoticeTimeout) {
+        clearTimeout(softNoticeTimeout);
+    }
+    softNoticeTimeout = setTimeout(() => {
+        notice.classList.remove('soft-notice-show');
+    }, 4000);
+}
 htmlElements.importButton.addEventListener('click', async (event) => {
     event.preventDefault();
     event.stopPropagation();
     const filePaths = await window.api.openFile();
     if (filePaths && filePaths.length > 0) {
+        const isWav = filePaths[0].toLowerCase().endsWith('.wav');
+        if (!isWav && !warnedNonWav) {
+            warnedNonWav = true;
+            showSoftNotice('Note: uncompressed .wav files are recommended for best results.');
+        }
         let waveformNum = await loadSong(filePaths[0]);
-        let filePathEnd = window.api.pathBasename(filePaths[0]);
-        updateTrackName(filePathEnd, waveformNum);
+        if (waveformNum !== -1 && waveformNum !== undefined) {
+            let filePathEnd = window.api.pathBasename(filePaths[0]);
+            updateTrackName(filePathEnd, waveformNum);
+        }
     } else {
         console.log('No file selected');
     }

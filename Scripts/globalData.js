@@ -499,10 +499,32 @@ export async function loadSong(filePath) {
         await globalState.wavesurferWaveforms[num].loadBlob(new Blob([audioBuffer]));
     } catch (err) {
         console.error("Wavesurfer load failed:", err);
+        presentErrorDialog("Unable to load audio file. For best results, use an uncompressed .wav.");
+        removeFailedWaveform(num);
+        return -1;
     }
     globalState.currentZoom = 10;
     updateTimeline(num);
     return num;
+}
+
+function removeFailedWaveform(waveformNum) {
+    const labelContainer = document.getElementById("labels-container" + String(waveformNum));
+    const waveform = document.getElementById("waveform" + String(waveformNum));
+    const annotationContainer = document.getElementById("segment-annotation-container" + String(waveformNum));
+    const track = document.getElementById("track" + String(waveformNum));
+    const trackContainer = document.getElementById("track-container" + String(waveformNum));
+
+    if (labelContainer) labelContainer.remove();
+    if (waveform) waveform.remove();
+    if (annotationContainer) annotationContainer.remove();
+    if (track) track.remove();
+    if (trackContainer) trackContainer.remove();
+
+    window.trackNames[waveformNum] = null;
+    if (globalState.wavesurferWaveforms[waveformNum]) {
+        globalState.wavesurferWaveforms[waveformNum].setMuted(true);
+    }
 }
 
 // helper function to create the track title bar

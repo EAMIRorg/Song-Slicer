@@ -1,6 +1,6 @@
 {
   "name": "song-slicer",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Display the form of a piece of music by highlighting and labeling various regions.",
   "productName": "Song-Slicer",
   "main": "main.js",
