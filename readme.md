@@ -85,4 +85,5 @@ Original authors:
 - Vincent Boothroyd (@vboothroyd)
 - Seth Frank (@sethbfrank)
 - Gibson Phillips (@gibsonPhillips)
+
 This project is now adapted and part of EAMIR, co-authored by V.J. Manzo (@vjmanzo)
