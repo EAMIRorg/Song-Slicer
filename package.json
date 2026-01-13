@@ -68,7 +68,7 @@
     "url": "git+https://github.com/gibsonPhillips/Horisontol-Song-Segmentation-App-Final.git"
   },
   "author": "EAMIR",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/gibsonPhillips/Horisontol-Song-Segmentation-App-Final/issues"
   },

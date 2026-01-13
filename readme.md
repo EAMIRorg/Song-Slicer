@@ -87,3 +87,7 @@ Original authors:
 - Gibson Phillips (@gibsonPhillips)
 
 This project is now adapted and part of EAMIR, co-authored by V.J. Manzo (@vjmanzo)
+
+## License
+Released under the AGPLv3 license.
+Original upstream components were released under the ISC License (see `NOTICE`).
