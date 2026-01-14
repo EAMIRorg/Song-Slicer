@@ -39,13 +39,19 @@ python3 -m venv venv
 npm start
 ```
 
+Windows manual install:
+```
+python -m venv venv
+.\venv\Scripts\pip install -r requirements.txt
+```
+
 ### Python notes
 - The app starts a local Flask server on port 5001 by default.
 - You can override the Python interpreter with `PYTHON=/path/to/python npm start`.
 - You can override the port with `PY_SERVER_PORT=5001`.
 
 ### Troubleshooting
-- `ModuleNotFoundError: flask`: install Python deps in the venv (`./venv/bin/pip install -r requirements.txt`).
+- `ModuleNotFoundError: flask`: install Python deps in the venv (`./venv/bin/pip install -r requirements.txt` or `.\venv\Scripts\pip install -r requirements.txt` on Windows).
 - `OSError: [Errno 48] Address already in use`: another server is on port 5001. Stop it or change `PY_SERVER_PORT`.
 
 ## Releases

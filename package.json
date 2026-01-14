@@ -11,7 +11,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "python3 -m pip install --upgrade pip && python3 -m pip install -r requirements.txt"
+    "postinstall": "node Scripts/postinstall.js"
   },
   "config": {
     "forge": {
