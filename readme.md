@@ -91,3 +91,7 @@ This project is now adapted and part of EAMIR, co-authored by V.J. Manzo (@vjman
 ## License
 Released under the AGPLv3 license.
 Original upstream components were released under the ISC License (see `NOTICE`).
+
+## Contributing
+
+Navigate to the [CONTRIBUTING.md](./CONTRIBUTING.md) file for guidelines on how to contribute to the project.
