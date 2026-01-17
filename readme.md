@@ -67,6 +67,8 @@ npm run make
 ```
 
 ### Codesign + notarize (macOS)
+`./build-and-sign.sh` runs the full macOS release flow (package, make, codesign, notarize, DMG).
+
 1) Store credentials in Keychain (one time):
 ```
 xcrun notarytool store-credentials "eamir-notary" \
@@ -74,11 +76,16 @@ xcrun notarytool store-credentials "eamir-notary" \
   --team-id "YOUR_APPLE_TEAM_ID" \
   --password "YOUR_APP_SPECIFIC_PASSWORD"
 ```
-2) Create a `signing.env` file (see `signing.env.example`) if you want to override the profile name.
-3) Run:
+2) Create a `signing.env` file (see `signing.env.example`) if you want to override the Keychain profile name.
+3) If you're signing under your own Apple Developer account, update the signing identity in `codesign-song-slicer.sh` (`TEAM_ID` and `IDENTITY`) to match your certificate.
+4) Run:
 ```
 ./build-and-sign.sh
 ```
+
+Notes for signing yourself:
+- Replace the Keychain profile by re-running `notarytool store-credentials` with your Apple ID/team and a new app-specific password.
+- Update `signing.env` to point at your new `NOTARY_PROFILE` name if you changed it.
 
 ### CSS
 Using System.css project
